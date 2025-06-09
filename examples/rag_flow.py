@@ -2,18 +2,46 @@
 
 from graphlib import flow, node
 
-# Define nodes for each step in the RAG process
-query_node = node("Query", lambda query: query)
-retrieval_node = node("Retrieval", lambda query: f"Retrieved documents based on query: {query}")
-generation_node = node("Generation", lambda query, documents: f"Generated response based on query '{query}' and documents '{documents}'")
-response_node = node("Response", lambda response: response)
+# Define a Node for the Query
+class QueryNode(node):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def run(self, query):
+        return query
+
+# Define a Node for Retrieval
+class RetrievalNode(node):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def run(self, query):
+        # Simulate retrieval of documents based on the query
+        return f"Retrieved documents based on query: {query}"
+
+# Define a Node for Generation
+class GenerationNode(node):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def run(self, query, documents):
+        # Simulate generation of a response based on the query and documents
+        return f"Generated response based on query '{query}' and documents '{documents}'"
+
+# Define a Node for the final Response
+class ResponseNode(node):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def run(self, response):
+        return response
 
 # Define the RAG flow
 rag_flow = flow(
-    query_node,
-    retrieval_node,
-    generation_node,
-    response_node
+    QueryNode("Query"),
+    RetrievalNode("Retrieval"),
+    GenerationNode("Generation"),
+    ResponseNode("Response")
 )
 
 # Example usage
