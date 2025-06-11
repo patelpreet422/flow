@@ -118,9 +118,16 @@ output, context = await main_flow.start()
 
 ## Installation
 
-1. Clone the repository
-2. Install dependencies (if any)
-3. Import and use in your project
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/graph-lib.git
+   cd graph-lib
+   ```
+2. Install dependencies using uv:
+   ```bash
+   uv pip install -r requirements.txt
+   ```
+3. Import and use in your project.
 
 ## Requirements
 

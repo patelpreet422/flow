@@ -1,7 +1,6 @@
 from typing import Dict, Any
 
-from graphlib.node import Node
-from graphlib.flow import Flow
+from flow import Node, Flow
 
 class InputNode(Node):
     """Node that sets up initial numbers in the context."""

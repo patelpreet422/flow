@@ -1,6 +1,89 @@
-from typing import Any, Dict, Optional, List, Tuple
+from typing import Any, Dict, Optional, NamedTuple, Union
+from abc import ABC, abstractmethod
 
-from .node import Node
+from typing import Any, Dict, Optional, Tuple
+
+class EdgeBuilder:
+    def __init__(self, node: 'Node', output: str):
+        self.node = node
+        self.output = output
+
+    def __rshift__(self, other: 'Node') -> 'Node':
+        self.node.add_edge(other, self.output)
+        return other
+    
+class Node(ABC):
+    """
+    Abstract base class for all nodes in the graph.
+    Each node has pre-execution, execution, and post-execution phases.
+    """
+    def __init__(self, name: str):
+        self.name = name
+        self.edges: Dict[str, 'Node'] = {}  # Maps output strings to next nodes
+        
+    def __sub__(self, output: str) -> 'EdgeBuilder':
+        return EdgeBuilder(self, output)
+
+    def __rshift__(self, other: 'Node') -> 'Node':
+        self.add_edge(other, "default")
+        return other
+
+    def add_edge(self, next_node: 'Node', output: str) -> None:
+        """
+        Add an edge from this node to another node based on output string.
+        
+        Args:
+            next_node: The destination node
+            output: The string output that triggers this edge. Defaults to "default"
+        """
+        self.edges[output] = next_node
+
+    @abstractmethod
+    async def pre(self, context: Dict[str, Any]) -> None:
+        """
+        Pre-execution phase - runs before exec.
+        
+        Args:
+            context: Shared context dictionary for the flow
+        """
+        pass
+    
+    @abstractmethod
+    async def exec(self, context: Dict[str, Any]) -> None:
+        """
+        Main execution phase.
+        
+        Args:
+            context: Shared context dictionary for the flow
+        """
+        pass
+    
+    async def post(self, context: Dict[str, Any]) -> str:
+        """
+        Post-execution phase - runs after exec.
+        Returns the output string that determines the next node.
+        Default implementation returns "default".
+        
+        Args:
+            context: Shared context dictionary for the flow
+            
+        Returns:
+            str: Output string determining the next node to execute
+        """
+        return "default"
+
+    def get_next_node(self, output: str) -> Optional['Node']:
+        """
+        Get the next node based on the output string.
+        
+        Args:
+            output: Output string from post execution
+            
+        Returns:
+            Optional[Node]: The next node to execute or None if no matching edge
+        """
+        return self.edges.get(output)
+
 
 class Flow(Node):
     """
