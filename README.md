@@ -1,4 +1,4 @@
-# Graph Flow Library
+# Flow Library
 
 A Python library for creating and executing graph-based workflows with context sharing and subflows.
 
@@ -21,7 +21,7 @@ The base class for all nodes in the graph. Each node has three execution phases:
 - `post()`: Post-execution cleanup and output determination
 
 ```python
-from src.node import Node
+from flow import Node
 
 class MyNode(Node):
     async def pre(self, context):
@@ -42,17 +42,14 @@ class MyNode(Node):
 A special type of node that can contain and manage other nodes. Flows can be used as nodes within other flows.
 
 ```python
-from src.flow import Flow
+from flow import Node, Flow
 
 # Create a flow with a root node
 flow = Flow("my_flow", root_node=first_node)
 
-# Add nodes to the flow
-flow.add_node(first_node)
-flow.add_node(second_node)
 
 # Connect nodes using >> operator
-first_node >> (second_node, "success")
+first_node - "success" > second_node
 
 # Start the flow with initial context
 output, final_context = await flow.start({"initial": "data"})
@@ -64,11 +61,9 @@ Nodes can be connected using the overloaded >> operator:
 
 ```python
 # Connect nodes with output conditions
-node1 >> (node2, "success")
-node1 >> (node3, "error")
+node1 - "success" > node2 # [named edges with edge name as success]
+node1 >> node3            # [unnamed edges with edge name as default]
 
-# Chain multiple connections
-node1 >> (node2, "success") >> (node3, "complete")
 ```
 
 ## Flow Control
@@ -96,38 +91,29 @@ print(f"Final state: {final_context}")
 
 ## Example
 
-See [examples/calculator_flow.py](examples/calculator_flow.py) for a complete example showing:
+See [examples/rag_flow.py](examples/rag_flow.py) for a complete example showing:
 - Node creation and connection using >>
 - Context sharing between nodes
 - Subflow usage with early termination
 - Conditional branching based on node outputs
 
-```python
-# Create and connect nodes
-input_node = InputNode("input")
-calc_flow = CalculationFlow("calculator")
-output_node = OutputNode("output")
-
-# Connect using >> operator
-input_node >> (calc_flow, "calculate")
-calc_flow >> (output_node, "success")
-
-# Execute the flow
-output, context = await main_flow.start()
-```
-
 ## Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/graph-lib.git
-   cd graph-lib
+   git clone https://github.com/patelpreet422/flow.git
+   cd flow
    ```
-2. Install dependencies using uv:
+2. Setup venv
+   ```bash
+   uv venv
+   source .venv/bin/activate
+   ```
+3. Install dependencies using uv:
    ```bash
    uv pip install -r requirements.txt
    ```
-3. Import and use in your project.
+4. Import and use in your project.
 
 ## Requirements
 
